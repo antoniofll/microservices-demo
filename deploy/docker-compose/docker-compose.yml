@@ -30,6 +30,8 @@ services:
     image: weaveworksdemos/catalogue:0.3.5
     hostname: catalogue
     restart: always
+    ports:
+      - 10082:80
     cap_drop:
       - all
     cap_add:
@@ -148,6 +150,8 @@ services:
     image: weaveworksdemos/user:0.4.4
     hostname: user
     restart: always
+    ports:
+      - 10081:80
     cap_drop:
       - all
     cap_add:
