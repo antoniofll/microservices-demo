@@ -137,6 +137,8 @@ services:
     image: weaveworksdemos/payment:0.4.3
     hostname: payment
     restart: always
+    ports:
+      - 10080:80
     cap_drop:
       - all
     cap_add:
