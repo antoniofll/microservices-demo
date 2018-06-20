@@ -5,6 +5,8 @@ services:
     image: weaveworksdemos/front-end:0.3.12
     hostname: front-end
     restart: always
+    ports:
+      - 8079:8079
     cap_drop:
       - all
     read_only: true
