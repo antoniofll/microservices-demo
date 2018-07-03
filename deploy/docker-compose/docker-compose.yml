@@ -2,19 +2,20 @@ version: '2'
 
 services:
   front-end:
-    image: weaveworksdemos/front-end:0.3.12
+    image: weaveworksdemos/front-end
     hostname: front-end
     restart: always
-    ports:
-      - 8079:8079
     cap_drop:
       - all
     read_only: true
-  edge-router:
-    image: weaveworksdemos/edge-router:0.1.1
     ports:
-      #- '80:80'
-      - '8100:8080'
+      - '8079:8079'
+
+  edge-router:
+    image: weaveworksdemos/edge-router
+    ports:
+      - '10080:80'
+      - '18080:8080'
     cap_drop:
       - all
     cap_add:
@@ -29,26 +30,29 @@ services:
     hostname: edge-router
     restart: always
   catalogue:
-    image: weaveworksdemos/catalogue:0.3.5
+    image: weaveworksdemos/catalogue
     hostname: catalogue
     restart: always
-    ports:
-      - 10082:80
     cap_drop:
       - all
     cap_add:
       - NET_BIND_SERVICE
     read_only: true
+    ports:
+      - '8083:80'
+
   catalogue-db:
-    image: weaveworksdemos/catalogue-db:0.3.0
+    image: weaveworksdemos/catalogue-db
     hostname: catalogue-db
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_ALLOW_EMPTY_PASSWORD=true
       - MYSQL_DATABASE=socksdb
+    ports:
+      - '3306:3306'
   carts:
-    image: weaveworksdemos/carts:0.4.8
+    image: weaveworksdemos/carts
     hostname: carts
     restart: always
     cap_drop:
@@ -59,9 +63,9 @@ services:
     tmpfs:
       - /tmp:rw,noexec,nosuid
     environment:
-      - JAVA_OPTS=-Xms64m -Xmx128m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom -Dspring.zipkin.enabled=false
+      - JAVA_OPTS=-Xms64m -Xmx128m -XX:PermSize=32m -XX:MaxPermSize=64m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom
   carts-db:
-    image: mongo:3.4
+    image: mongo
     hostname: carts-db
     restart: always
     cap_drop:
@@ -73,8 +77,10 @@ services:
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid
+    ports:
+      - '27017:27017'
   orders:
-    image: weaveworksdemos/orders:0.4.7
+    image: weaveworksdemos/orders
     hostname: orders
     restart: always
     cap_drop:
@@ -85,9 +91,9 @@ services:
     tmpfs:
       - /tmp:rw,noexec,nosuid
     environment:
-      - JAVA_OPTS=-Xms64m -Xmx128m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom -Dspring.zipkin.enabled=false
+      - JAVA_OPTS=-Xms64m -Xmx128m -XX:PermSize=32m -XX:MaxPermSize=64m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom
   orders-db:
-    image: mongo:3.4
+    image: mongo
     hostname: orders-db
     restart: always
     cap_drop:
@@ -99,8 +105,11 @@ services:
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid
+    ports:
+      - '27018:27017'  
+   
   shipping:
-    image: weaveworksdemos/shipping:0.4.8
+    image: weaveworksdemos/shipping
     hostname: shipping
     restart: always
     cap_drop:
@@ -111,9 +120,9 @@ services:
     tmpfs:
       - /tmp:rw,noexec,nosuid
     environment:
-      - JAVA_OPTS=-Xms64m -Xmx128m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom -Dspring.zipkin.enabled=false
+      - JAVA_OPTS=-Xms64m -Xmx128m -XX:PermSize=32m -XX:MaxPermSize=64m -XX:+UseG1GC -Djava.security.egd=file:/dev/urandom
   queue-master:
-    image: weaveworksdemos/queue-master:0.3.1
+    image: weaveworksdemos/queue-master
     hostname: queue-master
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -137,23 +146,28 @@ services:
       - SETUID
       - DAC_OVERRIDE
     read_only: true
+    ports:
+      - '4369:4369'
+      - '5671:5671'
+      - '5672:5672' 
+      - '25672:25672'
+   
   payment:
-    image: weaveworksdemos/payment:0.4.3
+    image: weaveworksdemos/payment
     hostname: payment
     restart: always
-    ports:
-      - 10080:80
     cap_drop:
       - all
     cap_add:
       - NET_BIND_SERVICE
     read_only: true
+    ports:
+      - '8081:80' 
+ 
   user:
-    image: weaveworksdemos/user:0.4.4
+    image: weaveworksdemos/user
     hostname: user
     restart: always
-    ports:
-      - 10081:80
     cap_drop:
       - all
     cap_add:
@@ -161,8 +175,11 @@ services:
     read_only: true
     environment:
       - MONGO_HOST=user-db:27017
+    ports:
+      - '8082:80'   
+   
   user-db:
-    image: weaveworksdemos/user-db:0.4.0
+    image: weaveworksdemos/user-db
     hostname: user-db
     restart: always
     cap_drop:
@@ -174,8 +191,11 @@ services:
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid
+    ports:
+      - '27019:27017' 
+   
   user-sim:
-    image: weaveworksdemos/load-test:0.1.1
+    image: weaveworksdemos/load-test
     cap_drop:
       - all
     read_only: true
